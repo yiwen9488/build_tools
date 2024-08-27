@@ -263,7 +263,7 @@ def make():
       base.delete_file(root_dir + "/libcef.lib")
 
     isMacArmPlaformOnIntel = False
-    if (platform == "mac_arm64") and not base.is_os_arm():
+    if (platform == "mac_arm64") and base.is_os_arm():
       isMacArmPlaformOnIntel = True
 
     # all themes generate ----

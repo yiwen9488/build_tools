@@ -35,9 +35,8 @@ def is_os_64bit():
   return platform.machine().endswith('64')
 
 def is_os_arm():
-  if -1 == platform.machine().find('arm'):
-    return False
-  return True
+  machine = platform.machine().lower()
+  return 'arm' in machine or 'aarch64' in machine
 
 def is_python_64bit():
   return (struct.calcsize("P") == 8)

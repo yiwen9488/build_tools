@@ -6,7 +6,7 @@ RUN apt-get -y update && \
 
 # qt source
 RUN mkdir /source && cd /source && \
-    wget -q https://download.qt.io/new_archive/qt/5.9/5.9.9/single/qt-everywhere-opensource-src-5.9.9.tar.xz && \
+    wget -q http://image.hi-hufei.com/qt/qt-everywhere-opensource-src-5.9.9.tar.xz && \
     tar -xf qt-everywhere-opensource-src-5.9.9.tar.xz
 
 # build dependencies

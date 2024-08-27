@@ -6,8 +6,7 @@ import config
 import base
 import os
 import subprocess
-import shutil
-import platform
+
 def change_bootstrap():
   base.move_file("./depot_tools/bootstrap/manifest.txt", "./depot_tools/bootstrap/manifest.txt.bak")
   content = "# changed by build_tools\n\n"
@@ -27,19 +26,19 @@ def change_bootstrap():
 
 def make_args(args, platform, is_64=True, is_debug=False):
   args_copy = args[:]
-  if config.is_linux_arm64:
+  if is_64:
+    args_copy.append("target_cpu=\\\"x64\\\"") 
+    args_copy.append("v8_target_cpu=\\\"x64\\\"")
+  else:
+    args_copy.append("target_cpu=\\\"x86\\\"") 
+    args_copy.append("v8_target_cpu=\\\"x86\\\"")
+
+  if (platform == "linux_arm64"):
     args_copy = args[:]
     args_copy.append("target_cpu=\\\"arm64\\\"")
     args_copy.append("v8_target_cpu=\\\"arm64\\\"")
     args_copy.append("use_sysroot=true")
-  else:
-    if is_64:
-      args_copy.append("target_cpu=\\\"x64\\\"")
-      args_copy.append("v8_target_cpu=\\\"x64\\\"")
-    else:
-      args_copy.append("target_cpu=\\\"x86\\\"")
-      args_copy.append("v8_target_cpu=\\\"x86\\\"")
-    
+  
   if is_debug:
     args_copy.append("is_debug=true")
     if (platform == "windows"):
@@ -49,8 +48,7 @@ def make_args(args, platform, is_64=True, is_debug=False):
 
   if (platform == "linux"):
     args_copy.append("is_clang=true")
-    if not config.is_linux_arm64:
-      args_copy.append("use_sysroot=false")
+    args_copy.append("use_sysroot=false")
   if (platform == "windows"):
     args_copy.append("is_clang=false")
 
@@ -275,7 +273,6 @@ def update_gcc_version():
   base.cmd("sudo",["update-alternatives", "--config", "gcc"])
   return
 # ----------------------------------------------------------------------
-
 def make():
   old_env = dict(os.environ)
   old_cur = os.getcwd()
@@ -329,39 +326,7 @@ def make():
              "use_custom_libcxx=false",
              "treat_warnings_as_errors=false"]
 
-  if config.is_linux_arm64:
-    if os.path.exists("./customnin"):
-      base.cmd("rm", ["-rf", "customnin"], False)
-    if os.path.exists("./customgn"):
-      base.cmd("rm", ["-rf", "customgn"], False)
-    install_clang()
-    gn_args.append("clang_base_path=\\\"/usr/\\\"")
-    gn_args.append("clang_use_chrome_plugins=false")
-    gn_args.append("use_lld = true")
-    base.cmd("build/linux/sysroot_scripts/install-sysroot.py", ["--arch=arm64"], False)
-    if not base.is_file("/bin/ninja"):
-      base.cmd("git", ["clone", "https://github.com/ninja-build/ninja.git", "-b", "v1.8.2", "customnin"], False)
-      os.chdir("customnin")
-      base.cmd("./configure.py", ["--bootstrap"])
-      os.chdir("../")
-      base.cmd("sudo", ["cp", "-v", "customnin/ninja", "/bin/ninja"])
-      shutil.rmtree("customnin")
-    if os.path.exists("/core/Common/3dParty/v8_89/depot_tools/ninja"):
-      base.cmd("rm", ["-v", "/core/Common/3dParty/v8_89/depot_tools/ninja"])
-
-    base.cmd("git", ["clone", "https://gn.googlesource.com/gn", "customgn"], False)
-    os.chdir("customgn")
-    base.cmd("git", ["checkout", "23d22bcaa71666e872a31fd3ec363727f305417e"], False)
-    base.cmd("sed", ["-i", "-e", "\"s/-Wl,--icf=all//\"", "build/gen.py"], False)
-    base.cmd("python", ["build/gen.py"], False)
-    base.cmd("ninja", ["-C", "out"])
-    os.chdir("../")
-    base.cmd("sudo", ["cp","./customgn/out/gn", "./buildtools/linux64/gn"])
-    shutil.rmtree("customgn")
-
-    base.cmd2("gn", ["gen", "out.gn/linux_arm64", make_args(gn_args, "linux", False)])
-    base.cmd("ninja", ["-C", "out.gn/linux_arm64"])
-  elif config.check_option("platform", "linux_64"):
+  if config.check_option("platform", "linux_64"):
     base.cmd2("gn", ["gen", "out.gn/linux_64", make_args(gn_args, "linux")])
     base.cmd("ninja", ["-C", "out.gn/linux_64"])
   elif config.check_option("platform", "linux_32"):
