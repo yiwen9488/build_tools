@@ -366,7 +366,7 @@ def make():
     base.cmd("git", ["clone", "https://gn.googlesource.com/gn", "customgn"], False)
     os.chdir("customgn")
     base.cmd("git", ["checkout", "23d22bcaa71666e872a31fd3ec363727f305417e"], False)
-    base.cmd("sed", ["-i", "-e", "\"s/-Wl,--icf=all//\"", "build/gen.py"], False)
+    base.cmd("sed", ["-i", "-e", "s/-Wl,--icf=all//", "build/gen.py"], False)
     base.cmd("python", ["build/gen.py"], False)
     base.cmd("ninja", ["-C", "out"])
     os.chdir("../")
