@@ -57,11 +57,11 @@ def install_qt():
   return
   
 def install_qt_prebuild():
-  url_amd64 = "https://s3.eu-west-1.amazonaws.com/static-doc.teamlab.eu.com/qt/5.9.9/linux_amd64/qt_binary.7z"
-  base.download(url_amd64, "./qt_amd64.7z")
-  base.extract("./qt_amd64.7z", "./qt_build")
+  url_arm64 = "https://s3.eu-west-1.amazonaws.com/static-doc.teamlab.eu.com/qt/5.9.9/linux_arm64/qt_binary.7z"
+  base.download(url_arm64, "./qt_arm64.7z")
+  base.extract("./qt_arm64.7z", "./qt_build")
   base.create_dir("./qt_build/Qt-5.9.9")
-  base.cmd("mv", ["./qt_build/qt_amd64", "./qt_build/Qt-5.9.9/gcc_64"])
+  base.cmd("mv", ["./qt_build/qt_arm64", "./qt_build/Qt-5.9.9/gcc_64"])
   base.setup_local_qmake("./qt_build/Qt-5.9.9/gcc_64/bin")
   return
 
