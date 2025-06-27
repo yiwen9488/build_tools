@@ -6,6 +6,7 @@ import config
 import base
 import os
 import subprocess
+import shutil
 
 def change_bootstrap():
   base.move_file("./depot_tools/bootstrap/manifest.txt", "./depot_tools/bootstrap/manifest.txt.bak")
