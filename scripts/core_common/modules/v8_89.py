@@ -341,7 +341,7 @@ def make():
   os.chdir("v8")
 
 
- if ("linux_arm64" == base.host_platform()):
+  if ("linux_arm64" == base.host_platform()):
     if os.path.exists("./customnin"):
       base.cmd("rm", ["-rf", "customnin"], False)
     if os.path.exists("./customgn"):
@@ -360,7 +360,7 @@ def make():
       shutil.rmtree("customnin")
     if os.path.exists("/core/Common/3dParty/v8_89/depot_tools/ninja"):
       base.cmd("rm", ["-v", "/core/Common/3dParty/v8_89/depot_tools/ninja"])
-
+  
     base.cmd("git", ["clone", "https://gn.googlesource.com/gn", "customgn"], False)
     os.chdir("customgn")
     base.cmd("git", ["checkout", "23d22bcaa71666e872a31fd3ec363727f305417e"], False)
