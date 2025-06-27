@@ -340,8 +340,22 @@ def make():
 
   os.chdir("v8")
 
+  
+  gn_args = ["v8_static_library=true",
+             "is_component_build=false",
+             "v8_monolithic=true",
+             "v8_use_external_startup_data=false",
+             "treat_warnings_as_errors=false"]
+    
+  if config.check_option("platform", "linux_64"):
+    base.cmd2("gn", ["gen", "out.gn/linux_64", make_args(gn_args, "linux")])
+    base.cmd("ninja", ["-C", "out.gn/linux_64"])
 
-  if ("linux_arm64" == base.host_platform()):
+  if config.check_option("platform", "linux_32"):
+    base.cmd2("gn", ["gen", "out.gn/linux_32", make_args(gn_args, "linux", False)])
+    base.cmd("ninja", ["-C", "out.gn/linux_32"])
+
+  if config.check_option("platform", "linux_arm64"):
     if os.path.exists("./customnin"):
       base.cmd("rm", ["-rf", "customnin"], False)
     if os.path.exists("./customgn"):
@@ -350,7 +364,6 @@ def make():
     gn_args.append("clang_base_path=\\\"/usr/\\\"")
     gn_args.append("clang_use_chrome_plugins=false")
     gn_args.append("use_lld = true")
-    base.cmd("build/linux/sysroot_scripts/install-sysroot.py", ["--arch=arm64"], False)
     if not base.is_file("/bin/ninja"):
       base.cmd("git", ["clone", "https://github.com/ninja-build/ninja.git", "-b", "v1.8.2", "customnin"], False)
       os.chdir("customnin")
@@ -370,23 +383,6 @@ def make():
     os.chdir("../")
     base.cmd("sudo", ["cp","./customgn/out/gn", "./buildtools/linux64/gn"])
     shutil.rmtree("customgn")
-
-  
-  gn_args = ["v8_static_library=true",
-             "is_component_build=false",
-             "v8_monolithic=true",
-             "v8_use_external_startup_data=false",
-             "treat_warnings_as_errors=false"]
-
-  if config.check_option("platform", "linux_64"):
-    base.cmd2("gn", ["gen", "out.gn/linux_64", make_args(gn_args, "linux")])
-    base.cmd("ninja", ["-C", "out.gn/linux_64"])
-
-  if config.check_option("platform", "linux_32"):
-    base.cmd2("gn", ["gen", "out.gn/linux_32", make_args(gn_args, "linux", False)])
-    base.cmd("ninja", ["-C", "out.gn/linux_32"])
-
-  if config.check_option("platform", "linux_arm64"):
     base.cmd("build/linux/sysroot_scripts/install-sysroot.py", ["--arch=arm64"], False)
     base.cmd2("gn", ["gen", "out.gn/linux_arm64", make_args(gn_args, "linux_arm64", False)])
     base.cmd("ninja", ["-C", "out.gn/linux_arm64"])
