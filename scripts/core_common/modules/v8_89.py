@@ -32,13 +32,6 @@ def change_bootstrap():
 
 def make_args(args, platform, is_64=True, is_debug=False):
   args_copy = args[:]
-  if is_64:
-    args_copy.append("target_cpu=\\\"x64\\\"") 
-    args_copy.append("v8_target_cpu=\\\"x64\\\"")
-  else:
-    args_copy.append("target_cpu=\\\"x86\\\"") 
-    args_copy.append("v8_target_cpu=\\\"x86\\\"")
-
   if (platform == "linux_arm64"):
     args_copy = args[:]
     args_copy.append("target_cpu=\\\"arm64\\\"")
@@ -204,30 +197,6 @@ def make():
              "v8_monolithic=true",
              "v8_use_external_startup_data=false",
              "treat_warnings_as_errors=false"]
-
-  if config.check_option("platform", "linux_64"):
-    if config.option("sysroot") != "":
-      src_replace = "config(\"compiler\") {\n  asmflags = []\n  cflags = []\n  cflags_c = []\n  cflags_cc = []\n  cflags_objc = []\n  cflags_objcc = []\n  ldflags = []"
-      dst_replace = "config(\"compiler\") {\n  asmflags = []\n  cflags = [\"--sysroot=" + config.option("sysroot") + "\"]" + "\n  cflags_c = []\n  cflags_cc = [\"--sysroot=" + config.option("sysroot") + "\"]" + "\n  cflags_objc = []\n  cflags_objcc = []\n  ldflags = [\"--sysroot=" + config.option("sysroot") + "\"]"
-      base.replaceInFile("build/config/compiler/BUILD.gn", src_replace, dst_replace)
-
-      src_replace = "gcc_toolchain(\"x64\") {\n  cc = \"gcc\"\n  cxx = \"g++\""
-      dst_replace = "gcc_toolchain(\"x64\") {\n  cc = \""+ config.get_custom_sysroot_bin() + "/gcc\"\n  cxx = \"" + config.get_custom_sysroot_bin() + "/g++\""
-      base.replaceInFile("build/toolchain/linux/BUILD.gn", src_replace, dst_replace)
-      
-      old_env = dict(os.environ)
-      base.set_sysroot_env()
-      base.cmd2("gn", ["gen", "out.gn/linux_64", make_args(gn_args, "linux")], False)
-      base.cmd2("ninja", ["-C", "out.gn/linux_64"], False)
-      base.restore_sysroot_env()
-    else:
-      base.cmd2("gn", ["gen", "out.gn/linux_64", make_args(gn_args, "linux")], False)
-      base.cmd2("ninja", ["-C", "out.gn/linux_64"], False)
-
-
-  if config.check_option("platform", "linux_32"):
-    base.cmd2("gn", ["gen", "out.gn/linux_32", make_args(gn_args, "linux", False)])
-    base.cmd("ninja", ["-C", "out.gn/linux_32"])
 
   if config.check_option("platform", "linux_arm64"):
     base.cmd("build/linux/sysroot_scripts/install-sysroot.py", ["--arch=arm64"], False)
