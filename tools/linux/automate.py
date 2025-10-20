@@ -57,7 +57,7 @@ def install_qt():
   return
   
 def install_qt_prebuild():
-  url_amd64 = "https://github.com/ONLYOFFICE-data/build_tools_data/raw/refs/heads/master/qt/qt_binary_linux_arm64.7z"
+  url_arm64 = "https://github.com/ONLYOFFICE-data/build_tools_data/raw/refs/heads/master/qt/qt_binary_linux_arm64.7z"
   base.download(url_arm64, "./qt_arm64.7z")
   base.extract("./qt_arm64.7z", "./qt_build")
   base.create_dir("./qt_build/Qt-5.9.9")
