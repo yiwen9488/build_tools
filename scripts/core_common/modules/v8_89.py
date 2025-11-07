@@ -207,6 +207,9 @@ def make():
              "treat_warnings_as_errors=false"]
 
   if config.check_option("platform", "linux_arm64"):
+    gn_args.append("clang_base_path=\\\"/usr/\\\"")
+    gn_args.append("clang_use_chrome_plugins=false")
+    gn_args.append("use_lld = true")
     base.cmd("build/linux/sysroot_scripts/install-sysroot.py", ["--arch=arm64"], False)
     base.cmd2("gn", ["gen", "out.gn/linux_arm64", make_args(gn_args, "linux_arm64", False)])
     base.cmd("ninja", ["-C", "out.gn/linux_arm64"])
