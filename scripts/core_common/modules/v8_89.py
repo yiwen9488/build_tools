@@ -40,7 +40,7 @@ def make_args(args, platform, is_64=True, is_debug=False):
     args_copy = args[:]
     args_copy.append("target_cpu=\\\"arm64\\\"")
     args_copy.append("v8_target_cpu=\\\"arm64\\\"")
-    args_copy.append("use_sysroot=true")
+    args_copy.append("use_sysroot=false")
     
   if (platform == "win_arm64"):
     args_copy = args[:]
@@ -209,7 +209,7 @@ def make():
   if config.check_option("platform", "linux_arm64"):
     gn_args.append("clang_base_path=\\\"/usr/\\\"")
     gn_args.append("clang_use_chrome_plugins=false")
-    gn_args.append("use_lld = true")
+    gn_args.append("use_lld=false")
     base.cmd("build/linux/sysroot_scripts/install-sysroot.py", ["--arch=arm64"], False)
     base.cmd2("gn", ["gen", "out.gn/linux_arm64", make_args(gn_args, "linux_arm64", False)])
     base.cmd("ninja", ["-C", "out.gn/linux_arm64"])
