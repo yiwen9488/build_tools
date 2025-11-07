@@ -292,3 +292,7 @@ def is_v8_60():
   #  return True
 
   return False
+
+def is_linux_arm64():
+  uname_result = os.uname()
+  return uname_result.sysname == 'Linux' and uname_result.machine == 'aarch64'
